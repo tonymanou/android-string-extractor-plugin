@@ -33,7 +33,7 @@ public class FlavorTest {
 
   @Test public void when_readStringValues_should_returnStringValues() throws Exception {
     StringValues expected = dummyStringValues();
-    when(stringValuesReader.read(any(File.class))).thenReturn(expected);
+    when(stringValuesReader.read(any(File.class), locale)).thenReturn(expected);
 
     StringValues actual =
         flavor.readStringValues();

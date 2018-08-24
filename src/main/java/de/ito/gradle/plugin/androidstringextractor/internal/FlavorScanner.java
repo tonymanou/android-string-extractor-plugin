@@ -14,12 +14,14 @@ class FlavorScanner {
   private final StringValuesReader stringValuesReader;
   private final StringValuesWriter stringValuesWriter;
   private final LayoutScanner layoutScanner;
+  private final ValuesQualifierScanner valuesQualifierScanner;
 
   FlavorScanner(StringValuesReader stringValuesReader, StringValuesWriter stringValuesWriter,
-      LayoutScanner layoutScanner) {
+      LayoutScanner layoutScanner, ValuesQualifierScanner valuesQualifierScanner) {
     this.stringValuesReader = stringValuesReader;
     this.stringValuesWriter = stringValuesWriter;
     this.layoutScanner = layoutScanner;
+    this.valuesQualifierScanner = valuesQualifierScanner;
   }
 
   List<Flavor> scan(File projectPath) throws FileNotFoundException {
@@ -40,7 +42,7 @@ class FlavorScanner {
 
     for (File flavorDirectory : flavorDirectories) {
       flavors.add(
-          new Flavor(flavorDirectory, stringValuesReader, stringValuesWriter, layoutScanner));
+          new Flavor(flavorDirectory, stringValuesReader, stringValuesWriter, layoutScanner, valuesQualifierScanner));
     }
 
     return flavors;

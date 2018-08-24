@@ -38,7 +38,7 @@ public class StringValuesReaderTest {
     when(xmlFileReader.read(any(File.class))).thenReturn(dummyStringValues);
     File flavorPath = createFileStructure();
 
-    StringValues actual = stringValuesReader.read(flavorPath);
+    StringValues actual = stringValuesReader.read(flavorPath, locale);
 
     assertThat(actual, equalTo(expected));
   }
@@ -51,7 +51,7 @@ public class StringValuesReaderTest {
     when(xmlFileReader.read(any(File.class))).thenReturn(dummyStringValues);
     File flavorPath = createFileStructure();
 
-    StringValues actual = stringValuesReader.read(flavorPath);
+    StringValues actual = stringValuesReader.read(flavorPath, locale);
 
     assertThat(actual, equalTo(expected));
   }

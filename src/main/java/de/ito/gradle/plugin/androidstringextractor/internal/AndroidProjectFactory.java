@@ -11,6 +11,7 @@ public class AndroidProjectFactory {
   LayoutScanner layoutScanner;
   FlavorScanner flavorScanner;
   ReferenceReplacer referenceReplacer;
+  ValuesQualifierScanner valuesQualifierScanner;
 
   public AndroidProjectFactory() {
     layoutParser = new LayoutParser();
@@ -21,7 +22,8 @@ public class AndroidProjectFactory {
     stringValuesWriter = new StringValuesWriter(xmlFileWriter);
     layoutScanner =
         new LayoutScanner(xmlFileReader, layoutParser, xmlFileWriter, referenceReplacer);
-    flavorScanner = new FlavorScanner(stringValuesReader, stringValuesWriter, layoutScanner);
+    valuesQualifierScanner = new ValuesQualifierScanner();
+    flavorScanner = new FlavorScanner(stringValuesReader, stringValuesWriter, layoutScanner, valuesQualifierScanner);
   }
 
   AndroidProject create(File projectPath) {

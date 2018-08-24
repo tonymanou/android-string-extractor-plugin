@@ -1,30 +1,25 @@
 package de.ito.gradle.plugin.androidstringextractor.internal;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-class StringValues {
-  final String qualifier;
-  private final Map<String, String> values;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+class StringValues2 {
+  private final Map<String, StringValues> values;
   private boolean hasChanged;
 
-  StringValues(String qualifier) {
-    this(qualifier, new LinkedHashMap<>());
-  }
-  
-  StringValues(String qualifier, Map<String, String> values) {
-    this.qualifier = qualifier;
-    this.values = values;
+  StringValues2() {
+    values = new LinkedHashMap<>();
   }
 
-  Map<String, String> getValues() {
-    return values;
+  StringValues getValues() {
+    return values.get(null);
   }
 
-  void put(String key, String value) {
+  void put(String key, StringValues value) {
     values.put(key, value);
     hasChanged = true;
   }

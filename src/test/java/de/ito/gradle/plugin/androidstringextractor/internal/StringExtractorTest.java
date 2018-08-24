@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class LayoutStringExtractorTest {
+public class StringExtractorTest {
   private MockAndroidProjectFactory factory;
   private List<StringOccurrence> expectedStrings;
   private StringValues expectedStringValues;
@@ -35,7 +35,7 @@ public class LayoutStringExtractorTest {
 
   @Test
   public void when_extract_should_modifyLayoutAndStringValues() throws Exception {
-    LayoutStringExtractor extractor = new LayoutStringExtractor(factory);
+    StringExtractor extractor = new StringExtractor(factory);
 
     extractor.extract("");
 

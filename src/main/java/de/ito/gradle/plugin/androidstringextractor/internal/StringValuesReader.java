@@ -28,23 +28,25 @@ class StringValuesReader {
     this.xmlFileReader = xmlFileReader;
   }
 
-  StringValues read(File flavorPath)
+  StringValues read(File flavorPath, String qualifier)
           throws ParserConfigurationException, SAXException, IOException {
-    File stringValuesFile = new File(flavorPath, "res/values/string_layouts.xml");
+    String valueDirectory = qualifier == null || qualifier.isEmpty() ? "string" : "values-" + qualifier;
+    File stringValuesFile = new File(flavorPath, "res/" + valueDirectory + "/strings.xml");
 
-    return resolveStringValues(stringValuesFile);
+    return resolveStringValues(stringValuesFile, qualifier);
   }
 
-  private StringValues resolveStringValues(File stringValuesFile)
+  private StringValues resolveStringValues(File stringValuesFile, String qualifier)
           throws ParserConfigurationException, SAXException, IOException {
-    if (!stringValuesFile.exists()) return new StringValues();
+    if (!stringValuesFile.exists()) return new StringValues(qualifier);
 
     Document document = xmlFileReader.read(stringValuesFile);
     NodeList strings = document.getElementsByTagName("string");
+    // TODO plurals
 
     Map<String, String> values = resolveStringValues(strings);
 
-    return new StringValues(values);
+    return new StringValues(qualifier, values);
   }
 
   private Map<String, String> resolveStringValues(NodeList strings) {
