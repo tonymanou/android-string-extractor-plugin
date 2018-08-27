@@ -1,8 +1,6 @@
 package de.ito.gradle.plugin.androidstringextractor.internal;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
@@ -151,21 +149,21 @@ class StringValuesReader {
     }
 
     NodeList nodes = node.getChildNodes();
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0, max = nodes.getLength(); i < max; i++) {
-       sb.append(lsSerializer.writeToString(childNodes.item(i)));
-    }
-    return sb.toString();
-
-    try {
+    try (StringBuilderWriter writer = new StringBuilderWriter()) {
       Transformer t = TransformerFactory.newInstance().newTransformer();
       t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      StringWriter sw = new StringWriter();
-      t.transform(new DOMSource(node.), new StreamResult(sw));
-      return sw.toString();
+
+      for (int i = 0, max = nodes.getLength(); i < max; i++) {
+        Node child = nodes.item(i);
+        if (child.getNodeType() == Node.COMMENT_NODE) {
+          continue;
+        }
+        t.transform(new DOMSource(child), new StreamResult(writer));
+      }
+
+      return writer.toString();
     } catch (TransformerException e) {
-      logger.severe("Failed to convert node to text: " + e);
-      return null;
+      throw new IllegalStateException("Failed to convert node to text", e);
     }
   }
 }

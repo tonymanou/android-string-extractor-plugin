@@ -10,7 +10,7 @@ import java.util.List;
 public class StringArrayRes implements Res {
 
   private final String key;
-  public final List<String> values = new LinkedList<>();
+  private final List<String> values = new LinkedList<>();
 
   public StringArrayRes(String key) {
     this.key = key;
@@ -18,6 +18,10 @@ public class StringArrayRes implements Res {
 
   public void add(String value) {
     values.add(value);
+  }
+
+  public List<String> getValues() {
+    return values;
   }
 
   @Override
