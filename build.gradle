@@ -11,6 +11,7 @@ group = 'de.ito.gradle.plugin'
 version = '0'
 
 repositories {
+  google()
   jcenter()
 }
 
@@ -19,6 +20,7 @@ configurations {
 }
 
 dependencies {
+  compileOnly 'com.android.tools.build:gradle:3.1.4'
   compileInto 'org.apache.commons:commons-lang3:3.4'
   compileInto 'org.apache.poi:poi-ooxml:3.15'
   compileInto 'org.marketcetera.fork:commons-csv:2.4.2'
