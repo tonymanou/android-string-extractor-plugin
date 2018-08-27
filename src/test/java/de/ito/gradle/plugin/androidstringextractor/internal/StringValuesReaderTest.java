@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
+
+import de.ito.gradle.plugin.androidstringextractor.internal.resource.StringRes;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,12 +35,13 @@ public class StringValuesReaderTest {
   }
 
   @Test public void when_readStringValuesFromFile_should_returnStringValues() throws Exception {
-    StringValues expected = createDummyStringValues();
+    String qualifier = "fr";
+    StringValues expected = createDummyStringValues(qualifier);
     Document dummyStringValues = createDummyDocument();
     when(xmlFileReader.read(any(File.class))).thenReturn(dummyStringValues);
-    File flavorPath = createFileStructure();
+    File flavorPath = createFileStructure(qualifier);
 
-    StringValues actual = stringValuesReader.read(flavorPath);
+    StringValues actual = stringValuesReader.read(flavorPath, qualifier);
 
     assertThat(actual, equalTo(expected));
   }
@@ -46,24 +49,25 @@ public class StringValuesReaderTest {
   @Test
   public void given_invalidFormatNode_when_readStringValuesFromFile_should_returnStringValues_andIgnoreInvalidNode()
           throws Exception {
-    StringValues expected = createDummyStringValues();
+    String qualifier = "fr";
+    StringValues expected = createDummyStringValues(qualifier);
     Document dummyStringValues = createDummyDocumentWithInvalidNode();
     when(xmlFileReader.read(any(File.class))).thenReturn(dummyStringValues);
-    File flavorPath = createFileStructure();
+    File flavorPath = createFileStructure(qualifier);
 
-    StringValues actual = stringValuesReader.read(flavorPath);
+    StringValues actual = stringValuesReader.read(flavorPath, qualifier);
 
     assertThat(actual, equalTo(expected));
   }
 
 
 
-  static StringValues createDummyStringValues() {
-    Map<String, String> values = new LinkedHashMap<>();
+  static StringValues createDummyStringValues(String qualifier) {
+    StringValues values = new StringValues(qualifier);
 
-    values.put("name", "value");
+    values.getValues().add(new StringRes("name", "value"));
 
-    return new StringValues(values);
+    return values;
   }
 
   static Document createDummyDocument() throws ParserConfigurationException {
@@ -89,9 +93,10 @@ public class StringValuesReaderTest {
     return string;
   }
 
-  private File createFileStructure() throws IOException {
+  private File createFileStructure(String qualifier) throws IOException {
     File flavorPath = new File(folder.getRoot(), "flavor/");
-    File stringValuesFile = new File(flavorPath, "res/values/string_layouts.xml");
+    String valueDirectory = qualifier == null || qualifier.isEmpty() ? "string" : "values-" + qualifier;
+    File stringValuesFile = new File(flavorPath, "res/" + valueDirectory + "/string.xml");
     stringValuesFile.mkdirs();
     stringValuesFile.createNewFile();
     return flavorPath;

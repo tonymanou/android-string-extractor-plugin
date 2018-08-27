@@ -18,6 +18,7 @@ public class FlavorTest {
   private StringValuesReader stringValuesReader;
   private StringValuesWriter stringValuesWriter;
   private LayoutScanner layoutScanner;
+  private ValuesQualifierScanner valuesQualifierScanner;
   private File path;
 
   private Flavor flavor;
@@ -26,23 +27,26 @@ public class FlavorTest {
     stringValuesReader = mock(StringValuesReader.class);
     stringValuesWriter = mock(StringValuesWriter.class);
     layoutScanner = mock(LayoutScanner.class);
+    valuesQualifierScanner = mock(ValuesQualifierScanner.class);
     path = mock(File.class);
 
-    flavor = new Flavor(path, stringValuesReader, stringValuesWriter, layoutScanner);
+    flavor = new Flavor(path, stringValuesReader, stringValuesWriter, layoutScanner, valuesQualifierScanner);
   }
 
   @Test public void when_readStringValues_should_returnStringValues() throws Exception {
-    StringValues expected = dummyStringValues();
-    when(stringValuesReader.read(any(File.class))).thenReturn(expected);
+    String qualifier = "fr";
+    StringValues expected = dummyStringValues(qualifier);
+    when(stringValuesReader.read(any(File.class), eq(qualifier))).thenReturn(expected);
 
     StringValues actual =
-        flavor.readStringValues();
+        flavor.readStringValues(qualifier);
 
     assertThat(actual, equalTo(expected));
   }
 
   @Test public void when_writeStringValues_should_writeStringValues() throws Exception {
-    StringValues stringValues = dummyStringValues();
+    String qualifier = "fr";
+    StringValues stringValues = dummyStringValues(qualifier);
 
     flavor.writeStringValues(stringValues);
 
@@ -58,8 +62,8 @@ public class FlavorTest {
     assertThat(actual, equalTo(expected));
   }
 
-  private StringValues dummyStringValues() {
-    StringValues stringValues = new StringValues();
+  private StringValues dummyStringValues(String qualifier) {
+    StringValues stringValues = new StringValues(qualifier);
 
     return stringValues;
   }

@@ -25,8 +25,9 @@ public class StringValuesWriterTest {
   }
 
   @Test public void when_writeStringValuesToFile_should_writeValuesToFile() throws Exception {
+    String qualifier = "fr";
     Document expectedDocument = createExpectedDocument();
-    StringValues stringValues = StringValuesReaderTest.createDummyStringValues();
+    StringValues stringValues = StringValuesReaderTest.createDummyStringValues(qualifier);
     File flavorPath = new File("");
     File stringValuesFile = new File(flavorPath, "res/values/string_layouts.xml");
 

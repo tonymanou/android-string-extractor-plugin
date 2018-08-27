@@ -50,12 +50,13 @@ class StringValuesWriter {
   }
 
   private void appendStrings(Document document, Element resources, StringValues stringValues) {
-    Map<String, String> values = stringValues.getValues();
-    for (String key : values.keySet()) {
-      Element string = buildString(document, key, values.get(key));
-
-      resources.appendChild(string);
-    }
+// TODO
+//    Map<String, String> values = stringValues.getValues();
+//    for (String key : values.keySet()) {
+//      Element string = buildString(document, key, values.get(key));
+//
+//      resources.appendChild(string);
+//    }
   }
 
   private Element buildString(Document document, String key, String stringValue) {

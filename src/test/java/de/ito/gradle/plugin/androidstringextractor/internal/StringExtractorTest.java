@@ -15,27 +15,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class LayoutStringExtractorTest {
+public class StringExtractorTest {
+  private String qualifier = "de";
   private MockAndroidProjectFactory factory;
   private List<StringOccurrence> expectedStrings;
   private StringValues expectedStringValues;
 
   @Before
   public void setUp() throws Exception {
-    factory = new MockAndroidProjectFactory();
+    factory = new MockAndroidProjectFactory(qualifier);
 
     expectedStrings =
         Arrays.asList(new StringOccurrence("id1", "attr1", "@string/layout1_id1_attr1"),
             new StringOccurrence("id2", "attr2", "@string/layout1_id2_attr2"));
 
-    expectedStringValues = new StringValues();
+    expectedStringValues = new StringValues(qualifier);
     expectedStringValues.put("layout1_id1_attr1", "referenced string");
     expectedStringValues.put("layout1_id2_attr2", "hardcoded string");
   }
 
   @Test
   public void when_extract_should_modifyLayoutAndStringValues() throws Exception {
-    LayoutStringExtractor extractor = new LayoutStringExtractor(factory);
+    StringExtractor extractor = new StringExtractor(factory);
 
     extractor.extract("");
 
@@ -47,7 +48,7 @@ public class LayoutStringExtractorTest {
     final Flavor flavor;
     final Layout layout;
 
-    MockAndroidProjectFactory() throws IOException, SAXException, ParserConfigurationException {
+    MockAndroidProjectFactory(String qualifier) throws IOException, SAXException, ParserConfigurationException {
       layoutParser = mock(LayoutParser.class);
       xmlFileReader = mock(XmlFileReader.class);
       xmlFileWriter = mock(XmlFileWriter.class);
@@ -58,21 +59,21 @@ public class LayoutStringExtractorTest {
 
       flavor = mock(Flavor.class);
       List<Flavor> flavors = Collections.singletonList(flavor);
-      StringValues stringValues = generateActualStringValues();
+      StringValues stringValues = generateActualStringValues(qualifier);
       layout = mock(Layout.class);
       List<Layout> layouts = Collections.singletonList(layout);
       List<StringOccurrence> strings = generateActualStrings();
 
       when(flavorScanner.scan(any(File.class))).thenReturn(flavors);
-      when(flavor.readStringValues()).thenReturn(stringValues);
+      when(flavor.readStringValues(qualifier)).thenReturn(stringValues);
       when(flavor.readLayouts()).thenReturn(layouts);
       when(layout.readStrings()).thenReturn(strings);
       when(layout.computeStringReference(any(StringOccurrence.class))).thenReturn(
           "layout1_id2_attr2");
     }
 
-    private StringValues generateActualStringValues() {
-      StringValues values = new StringValues();
+    private StringValues generateActualStringValues(String qualifier) {
+      StringValues values = new StringValues(qualifier);
       values.put("layout1_id1_attr1", "referenced string");
 
       return values;

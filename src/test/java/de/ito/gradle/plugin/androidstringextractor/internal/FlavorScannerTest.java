@@ -19,6 +19,7 @@ public class FlavorScannerTest {
   private StringValuesReader stringValuesReader;
   private StringValuesWriter stringValuesWriter;
   private LayoutScanner layoutScanner;
+  private ValuesQualifierScanner valuesQualifierScanner;
 
   private FlavorScanner flavorScanner;
 
@@ -26,8 +27,9 @@ public class FlavorScannerTest {
     stringValuesReader = mock(StringValuesReader.class);
     stringValuesWriter = mock(StringValuesWriter.class);
     layoutScanner = mock(LayoutScanner.class);
+    valuesQualifierScanner = mock(ValuesQualifierScanner.class);
 
-    flavorScanner = new FlavorScanner(stringValuesReader, stringValuesWriter, layoutScanner);
+    flavorScanner = new FlavorScanner(stringValuesReader, stringValuesWriter, layoutScanner, valuesQualifierScanner);
   }
 
   @Test public void when_scanFolder_should_returnFlavors() throws Exception {
@@ -43,7 +45,7 @@ public class FlavorScannerTest {
     return Collections.singletonList(
         new Flavor(new File(folder.getRoot(), "app/src/main/"), stringValuesReader,
             stringValuesWriter,
-            layoutScanner));
+            layoutScanner, valuesQualifierScanner));
   }
 
   private File createDummyFlavorsInPath() {
