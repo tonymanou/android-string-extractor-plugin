@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-public class XlsPrinter implements Printer {
+public class XlsxPrinter implements Printer {
 
   private final XSSFWorkbook workbook = new XSSFWorkbook();
   private final OutputStream outputStream;
@@ -28,7 +28,7 @@ public class XlsPrinter implements Printer {
   private int rowNum = 0;
   private int columnCount = 0;
 
-  public XlsPrinter(OutputStream out) {
+  public XlsxPrinter(OutputStream out) {
 //    baseStyle.setAlignment(HorizontalAlignment.JUSTIFY);
     baseStyle.setWrapText(true);
     outputStream = out;

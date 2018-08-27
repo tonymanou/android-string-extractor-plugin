@@ -3,14 +3,12 @@ package de.ito.gradle.plugin.androidstringextractor;
 import de.ito.gradle.plugin.androidstringextractor.internal.AndroidProjectFactory;
 import de.ito.gradle.plugin.androidstringextractor.internal.StringExtractor;
 import de.ito.gradle.plugin.androidstringextractor.internal.StringValues;
-import de.ito.gradle.plugin.androidstringextractor.internal.io.CsvPrinter;
 import de.ito.gradle.plugin.androidstringextractor.internal.io.Printer;
-import de.ito.gradle.plugin.androidstringextractor.internal.io.XlsPrinter;
+import de.ito.gradle.plugin.androidstringextractor.internal.io.XlsxPrinter;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.PluralRes;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.Res;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.StringArrayRes;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.StringRes;
-import org.apache.commons.csv.CSVPrinter;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -44,8 +42,8 @@ public class AndroidStringExtractorTask extends DefaultTask {
       headers.add("en");
       headers.addAll(qualifiers);
 
-      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + ".xls"))) {
-        Printer printer = new XlsPrinter(out);
+      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + ".xlsx"))) {
+        Printer printer = new XlsxPrinter(out);
         printer.addHeaderRow(headers.toArray(new String[headers.size()]));
 
         data.get(null).getValues().forEach(res -> {
