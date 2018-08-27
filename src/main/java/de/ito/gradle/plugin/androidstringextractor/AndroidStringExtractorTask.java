@@ -104,7 +104,7 @@ public class AndroidStringExtractorTask extends DefaultTask {
         i++;
       }
 
-      if (Arrays.stream(strings).anyMatch(Objects::nonNull)) {
+      if (Arrays.stream(strings).anyMatch(s -> s != null && !s.isEmpty())) {
         String[] line = new String[qualifiers.size() + 2];
         line[0] = key + "[" + quantity + "]";
         for (int j = 0, max = strings.length; j < max; j++) {
