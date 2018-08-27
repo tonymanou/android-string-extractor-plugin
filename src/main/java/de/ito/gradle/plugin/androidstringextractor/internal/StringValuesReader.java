@@ -1,8 +1,10 @@
 package de.ito.gradle.plugin.androidstringextractor.internal;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -155,7 +157,12 @@ class StringValuesReader {
         t.transform(new DOMSource(child), new StreamResult(writer));
       }
 
-      return writer.toString();
+      String str = writer.toString();
+
+      // Cleanup lines
+      return Arrays.stream(str.split("\\s*\n\\s*"))
+        .filter(s -> !s.trim().isEmpty())
+        .collect(Collectors.joining(" "));
     } catch (TransformerException e) {
       throw new IllegalStateException("Failed to convert node to text", e);
     }
