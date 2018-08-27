@@ -60,12 +60,6 @@ class StringValuesReader {
       return;
     }
 
-    try {
-      logger.severe("parsing node: " + convertNodeToText(node));
-    } catch (TransformerException e) {
-      logger.severe("parsing node ???");
-    }
-
     Node nameAttribute = attributes.getNamedItem("name");
     if (nameAttribute == null) {
       return;
