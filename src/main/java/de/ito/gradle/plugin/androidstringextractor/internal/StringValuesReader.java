@@ -83,7 +83,7 @@ class StringValuesReader {
 
   private void handleStringNode(Node node, String key, NamedNodeMap attributes, StringValues values) {
     Node translatableAttribute = attributes.getNamedItem("translatable");
-    if (translatableAttribute == null || !"true".equals(translatableAttribute.getNodeValue())) {
+    if (translatableAttribute == null || !"false".equalsIgnoreCase(translatableAttribute.getNodeValue())) {
       values.put(new StringRes(key, convertNodeContentToText(node)));
     }
   }
