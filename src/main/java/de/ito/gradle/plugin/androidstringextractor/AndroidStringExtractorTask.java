@@ -3,6 +3,9 @@ package de.ito.gradle.plugin.androidstringextractor;
 import de.ito.gradle.plugin.androidstringextractor.internal.AndroidProjectFactory;
 import de.ito.gradle.plugin.androidstringextractor.internal.StringExtractor;
 import de.ito.gradle.plugin.androidstringextractor.internal.StringValues;
+import de.ito.gradle.plugin.androidstringextractor.internal.io.CsvPrinter;
+import de.ito.gradle.plugin.androidstringextractor.internal.io.Printer;
+import de.ito.gradle.plugin.androidstringextractor.internal.io.XlsPrinter;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.PluralRes;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.Res;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.StringArrayRes;
@@ -41,9 +44,9 @@ public class AndroidStringExtractorTask extends DefaultTask {
       headers.add("en");
       headers.addAll(qualifiers);
 
-      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + ".csv"))) {
-        CSVPrinter printer = new CSVPrinter(out);
-        printer.println(headers.toArray(new String[headers.size()]));
+      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + ".xls"))) {
+        Printer printer = new XlsPrinter(out);
+        printer.addHeaderRow(headers.toArray(new String[headers.size()]));
 
         data.get(null).getValues().forEach(res -> {
           if (res instanceof StringRes) {
@@ -54,13 +57,15 @@ public class AndroidStringExtractorTask extends DefaultTask {
             printStringArray(printer, (StringArrayRes) res, data, qualifiers);
           }
         });
+
+        printer.writeToDisk();
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
     });
   }
 
-  private void printString(CSVPrinter printer, StringRes res, Map<String, StringValues> data, List<String> qualifiers) {
+  private void printString(Printer printer, StringRes res, Map<String, StringValues> data, List<String> qualifiers) {
     String key = res.getKey();
     String[] line = new String[qualifiers.size() + 2];
     line[0] = nonNull(key);
@@ -79,10 +84,10 @@ public class AndroidStringExtractorTask extends DefaultTask {
       }
       i++;
     }
-    printer.println(line);
+    printer.addRow(line);
   }
 
-  private void printPlural(CSVPrinter printer, PluralRes res, Map<String, StringValues> data, List<String> qualifiers) {
+  private void printPlural(Printer printer, PluralRes res, Map<String, StringValues> data, List<String> qualifiers) {
     String key = res.getKey();
     Arrays.stream(PluralRes.Quantity.values()).forEach(quantity -> {
       String[] strings = new String[qualifiers.size() + 1];
@@ -107,12 +112,12 @@ public class AndroidStringExtractorTask extends DefaultTask {
         for (int j = 0, max = strings.length; j < max; j++) {
           line[j + 1] = nonNull(strings[j]);
         }
-        printer.println(line);
+        printer.addRow(line);
       }
     });
   }
 
-  private void printStringArray(CSVPrinter printer, StringArrayRes res, Map<String, StringValues> data, List<String> qualifiers) {
+  private void printStringArray(Printer printer, StringArrayRes res, Map<String, StringValues> data, List<String> qualifiers) {
     String key = res.getKey();
     List<List<String>> lists = new ArrayList<>(qualifiers.size() + 1);
     lists.add(res.getValues());
@@ -142,7 +147,7 @@ public class AndroidStringExtractorTask extends DefaultTask {
         }
         i++;
       }
-      printer.println(line);
+      printer.addRow(line);
     }
   }
 

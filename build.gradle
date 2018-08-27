@@ -20,6 +20,7 @@ configurations {
 
 dependencies {
   compileInto 'org.apache.commons:commons-lang3:3.4'
+  compileInto 'org.apache.poi:poi-ooxml:3.15'
   compileInto 'org.marketcetera.fork:commons-csv:2.4.2'
   testCompile 'org.mockito:mockito-core:1.+'
   testCompile 'junit:junit:4.12'
