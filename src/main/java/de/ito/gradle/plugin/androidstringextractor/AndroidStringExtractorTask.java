@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class AndroidStringExtractorTask extends DefaultTask {
 
   private final StringExtractor stringExtractor;
-  private boolean exportToExcel = false;
+  private Output exportOutput = Output.CSV;
 
   public AndroidStringExtractorTask() {
     stringExtractor = new StringExtractor(new AndroidProjectFactory());
@@ -44,19 +44,17 @@ public class AndroidStringExtractorTask extends DefaultTask {
       headers.add("en");
       headers.addAll(qualifiers);
 
-      String extension;
-      if (exportToExcel) {
-        extension = ".xlsx";
-      } else {
-        extension = ".csv";
-      }
-
-      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + extension))) {
+      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + exportOutput.getExtension()))) {
         Printer printer;
-        if (exportToExcel) {
-          printer = new XlsxPrinter(out);
-        } else {
-          printer = new CsvPrinter(out);
+        switch (exportOutput) {
+          case XLS:
+            printer = new XlsxPrinter(out, false);
+            break;
+          case XLSX:
+            printer = new XlsxPrinter(out, true);
+            break;
+          default:
+            printer = new CsvPrinter(out);
         }
 
         printer.addHeaderRow(headers.toArray(new String[headers.size()]));
@@ -78,8 +76,8 @@ public class AndroidStringExtractorTask extends DefaultTask {
     });
   }
 
-  public void setExportToExcel(boolean exportToExcel) {
-    this.exportToExcel = exportToExcel;
+  public void setExportOutput(Output exportOutput) {
+    this.exportOutput = exportOutput;
   }
 
   private void printString(Printer printer, StringRes res, Map<String, StringValues> data, List<String> qualifiers) {
@@ -170,5 +168,13 @@ public class AndroidStringExtractorTask extends DefaultTask {
 
   private static String nonNull(String s) {
     return s == null ? "" : s;
+  }
+
+  public enum Output {
+    CSV, XLS, XLSX;
+
+    String getExtension() {
+      return "." + name().toLowerCase();
+    }
   }
 }

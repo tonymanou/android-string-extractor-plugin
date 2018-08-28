@@ -1,9 +1,9 @@
 package de.ito.gradle.plugin.androidstringextractor.internal.io;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.SheetUtil;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.awt.font.FontRenderContext;
@@ -19,18 +19,29 @@ import java.util.logging.Logger;
 
 public class XlsxPrinter implements Printer {
 
-  private final XSSFWorkbook workbook = new XSSFWorkbook();
   private final OutputStream outputStream;
-
-  private CellStyle baseStyle = workbook.createCellStyle();
-  private XSSFSheet sheet = workbook.createSheet("Datatypes in Java");
+  private final Workbook workbook;
+  private final CellStyle baseStyle;
+  private final Sheet sheet;
 
   private int rowNum = 0;
   private int columnCount = 0;
 
-  public XlsxPrinter(OutputStream out) {
-//    baseStyle.setAlignment(HorizontalAlignment.JUSTIFY);
-    baseStyle.setWrapText(true);
+  public XlsxPrinter(OutputStream out, boolean x) {
+    if (x) {
+      workbook = new XSSFWorkbook();
+    } else {
+      workbook = new HSSFWorkbook();
+    }
+
+    sheet = workbook.createSheet("Translations");
+
+    CellStyle style = workbook.createCellStyle();
+    Font font = workbook.createFont();
+    style.setFont(font);
+    style.setWrapText(true);
+    baseStyle = style;
+
     outputStream = out;
   }
 
