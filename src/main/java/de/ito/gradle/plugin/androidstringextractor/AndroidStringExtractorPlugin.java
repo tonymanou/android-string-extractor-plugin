@@ -12,8 +12,12 @@ public class AndroidStringExtractorPlugin implements Plugin<Project> {
   @Override
   public void apply(Project target) {
 //      target.getExtensions().create("localization", StringExtractorConfig.class);
-      TaskContainer tasks = target.getTasks();
-      tasks.create(TASK_NAME, AndroidStringExtractorTask.class).setGroup(GROUP_NAME);
-      tasks.create("normalizeStringFiles", AndroidStringExtractorTask.class).setGroup(GROUP_NAME);
+    TaskContainer tasks = target.getTasks();
+
+    tasks.create("exportStringsToCsv", AndroidStringExtractorTask.class, task -> task.setGroup(GROUP_NAME));
+    tasks.create("exportStringsToXlsx", AndroidStringExtractorTask.class, task -> {
+      task.setExportToExcel(true);
+      task.setGroup(GROUP_NAME);
+    });
   }
 }

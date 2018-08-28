@@ -3,6 +3,7 @@ package de.ito.gradle.plugin.androidstringextractor;
 import de.ito.gradle.plugin.androidstringextractor.internal.AndroidProjectFactory;
 import de.ito.gradle.plugin.androidstringextractor.internal.StringExtractor;
 import de.ito.gradle.plugin.androidstringextractor.internal.StringValues;
+import de.ito.gradle.plugin.androidstringextractor.internal.io.CsvPrinter;
 import de.ito.gradle.plugin.androidstringextractor.internal.io.Printer;
 import de.ito.gradle.plugin.androidstringextractor.internal.io.XlsxPrinter;
 import de.ito.gradle.plugin.androidstringextractor.internal.resource.PluralRes;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class AndroidStringExtractorTask extends DefaultTask {
 
   private final StringExtractor stringExtractor;
+  private boolean exportToExcel = false;
 
   public AndroidStringExtractorTask() {
     stringExtractor = new StringExtractor(new AndroidProjectFactory());
@@ -42,8 +44,21 @@ public class AndroidStringExtractorTask extends DefaultTask {
       headers.add("en");
       headers.addAll(qualifiers);
 
-      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + ".xlsx"))) {
-        Printer printer = new XlsxPrinter(out);
+      String extension;
+      if (exportToExcel) {
+        extension = ".xlsx";
+      } else {
+        extension = ".csv";
+      }
+
+      try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + extension))) {
+        Printer printer;
+        if (exportToExcel) {
+          printer = new XlsxPrinter(out);
+        } else {
+          printer = new CsvPrinter(out);
+        }
+
         printer.addHeaderRow(headers.toArray(new String[headers.size()]));
 
         data.get(null).getValues().forEach(res -> {
@@ -61,6 +76,10 @@ public class AndroidStringExtractorTask extends DefaultTask {
         throw new RuntimeException(e);
       }
     });
+  }
+
+  public void setExportToExcel(boolean exportToExcel) {
+    this.exportToExcel = exportToExcel;
   }
 
   private void printString(Printer printer, StringRes res, Map<String, StringValues> data, List<String> qualifiers) {
