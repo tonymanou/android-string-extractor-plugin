@@ -53,6 +53,9 @@ public class XlsxPrinter implements Printer {
     Font font = workbook.createFont();
     font.setBold(true);
     CellStyle style = workbook.createCellStyle();
+    style.setAlignment(HorizontalAlignment.CENTER);
+    style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
     style.setFont(font);
 
     if (rowNum == 0) {
@@ -63,7 +66,7 @@ public class XlsxPrinter implements Printer {
     for (int i = 0; i < columns.length; i++) {
       Cell cell = row.createCell(i);
       cell.setCellStyle(style);
-      cell.setCellValue(columns[i]);
+      cell.setCellValue(prepareString(columns[i]));
     }
   }
 
@@ -77,7 +80,7 @@ public class XlsxPrinter implements Printer {
       if (i != 0) {
         cell.setCellStyle(baseStyle);
       }
-      cell.setCellValue(columns[i]);
+      cell.setCellValue(prepareString(columns[i]));
     }
   }
 
@@ -85,6 +88,7 @@ public class XlsxPrinter implements Printer {
   public void writeToDisk() throws IOException {
     Font font = workbook.createFont();
     font.setItalic(true);
+    font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
     CellStyle style = workbook.createCellStyle();
     style.setFont(font);
 
@@ -93,7 +97,7 @@ public class XlsxPrinter implements Printer {
         sheet.setDefaultColumnStyle(i, style);
         sheet.autoSizeColumn(i);
       } else {
-        sheet.setColumnWidth(i, 50 * 256);
+        sheet.setColumnWidth(i, 40 * 256);
       }
     }
 
@@ -309,5 +313,14 @@ public class XlsxPrinter implements Printer {
     if (font.getUnderline() == Font.U_SINGLE) {
       str.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON, startIdx, endIdx);
     }
+  }
+
+  private static String prepareString(String string) {
+    if (string == null) {
+      return null;
+    }
+    return string
+            .replaceAll("\\\\'", "'")
+            .replaceAll("\\\\n", "<newline/>\n");
   }
 }
