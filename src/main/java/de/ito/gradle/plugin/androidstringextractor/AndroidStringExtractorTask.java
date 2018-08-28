@@ -35,13 +35,15 @@ public class AndroidStringExtractorTask extends DefaultTask {
         return;
       }
 
+      String defaultLocale = "en";
+
       List<String> qualifiers = data.keySet().stream()
-              .filter(lang -> lang != null && !"en".equals(lang))
+              .filter(lang -> lang != null && !defaultLocale.equals(lang))
               .sorted()
               .collect(Collectors.toList());
       List<String> headers = new ArrayList<>();
-      headers.add("key");
-      headers.add("en");
+      headers.add("name");
+      headers.add(defaultLocale + " (default)");
       headers.addAll(qualifiers);
 
       try (OutputStream out = new FileOutputStream(new File(projectPath, "strings_" + flavor + exportOutput.getExtension()))) {
