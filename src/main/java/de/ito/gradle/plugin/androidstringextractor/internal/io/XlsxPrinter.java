@@ -48,7 +48,7 @@ public class XlsxPrinter implements Printer {
 
   @Override
   public void addHeaderRow(String[] columns) {
-    columnCount = Math.max(columnCount, columns.length);
+    updateMaxColumnCount(columns);
 
     Font font = workbook.createFont();
     font.setBold(true);
@@ -72,7 +72,7 @@ public class XlsxPrinter implements Printer {
 
   @Override
   public void addRow(String[] columns) {
-    columnCount = Math.max(columnCount, columns.length);
+    updateMaxColumnCount(columns);
 
     Row row = sheet.createRow(rowNum++);
     for (int i = 0; i < columns.length; i++) {
@@ -82,6 +82,10 @@ public class XlsxPrinter implements Printer {
       }
       cell.setCellValue(prepareString(columns[i]));
     }
+  }
+
+  private void updateMaxColumnCount(String[] columns) {
+    columnCount = Math.max(columnCount, columns.length);
   }
 
   @Override
@@ -133,13 +137,11 @@ public class XlsxPrinter implements Printer {
   }
 
   private double getRowHeight(Row row) {
-    int defaultCharHeight = getDefaultCharHeight();
-
     double height = -1;
     for (int c = 0, max = columnCount; c <= max; c++) {
       Cell cell = row.getCell(c);
       if (cell != null) {
-        double cellHeight = getCellHeight(cell, defaultCharHeight);
+        double cellHeight = getCellHeight(cell);
         height = Math.max(height, cellHeight);
       }
     }
@@ -167,14 +169,11 @@ public class XlsxPrinter implements Printer {
   /**
    * Copy text attributes from the supplied Font to Java2D AttributedString
    */
-  private int getDefaultCharHeight() {
-    Font font = workbook.getFontAt((short) 0);
-    int startIdx = 0;
-    int endIdx = 1;
+  private static int getDefaultCharHeight(Font font) {
     AttributedString str = new AttributedString(String.valueOf(DEFAULT_CHAR));
 
     // Copy attributes
-    copyAttributes(font, str, startIdx, endIdx);
+    copyAttributes(font, str, 0, 1);
 
     TextLayout layout = new TextLayout(str.getIterator(), fontRenderContext);
     return (int) (layout.getAscent() + layout.getDescent());
@@ -183,11 +182,10 @@ public class XlsxPrinter implements Printer {
   /**
    * Compute width of a single cell
    *
-   * @param cell              the cell whose width is to be calculated
-   * @param defaultCharHeight the width of a single character
+   * @param cell the cell whose width is to be calculated
    * @return the width in pixels or -1 if cell is empty
    */
-  private static double getCellHeight(Cell cell, int defaultCharHeight) {
+  private static double getCellHeight(Cell cell) {
     Sheet sheet = cell.getSheet();
     Workbook wb = sheet.getWorkbook();
     Row row = cell.getRow();
@@ -212,16 +210,14 @@ public class XlsxPrinter implements Printer {
       cellType = cell.getCachedFormulaResultTypeEnum();
 
     Font font = wb.getFontAt(style.getFontIndex());
+    int defaultCharHeight = getDefaultCharHeight(font);
 
     double height = -1;
     if (cellType == CellType.STRING) {
       RichTextString rt = cell.getRichStringCellValue();
-      String[] lines = rt.getString().split("\\n");
-      for (String line : lines) {
-        if (line.isEmpty()) {
-          continue;
-        }
+      String line = rt.getString();
 
+      if (!line.isEmpty()) {
         AttributedString str = new AttributedString(line);
         copyAttributes(font, str, 0, line.length());
 
