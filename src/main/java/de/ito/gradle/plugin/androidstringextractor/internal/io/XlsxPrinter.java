@@ -176,6 +176,7 @@ public class XlsxPrinter implements Printer {
     copyAttributes(font, str, 0, 1);
 
     TextLayout layout = new TextLayout(str.getIterator(), fontRenderContext);
+    logger.severe("Font ascent: " + layout.getAscent() + ", descent: " + layout.getDescent());
     return (int) (layout.getAscent() + layout.getDescent());
   }
 
@@ -271,6 +272,7 @@ public class XlsxPrinter implements Printer {
       measurer.setPosition(nextPos);
     }
 
+    logger.severe("Line count: " + lineCount + ", content: " + txt.replaceAll("\n", " "));
     return Math.max(minHeight, lineCount * defaultCharHeight * 1.2);
 
 //    TextLayout layout = new TextLayout(str.getIterator(), fontRenderContext);
