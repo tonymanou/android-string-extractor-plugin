@@ -24,6 +24,7 @@ public class XlsxPrinter implements Printer {
   private final CellStyle baseStyle;
   private final Sheet sheet;
 
+  private boolean hasHeader = false;
   private int rowNum = 0;
   private int columnCount = 0;
 
@@ -53,6 +54,10 @@ public class XlsxPrinter implements Printer {
     font.setBold(true);
     CellStyle style = workbook.createCellStyle();
     style.setFont(font);
+
+    if (rowNum == 0) {
+      hasHeader = true;
+    }
 
     Row row = sheet.createRow(rowNum++);
     for (int i = 0; i < columns.length; i++) {
@@ -100,6 +105,10 @@ public class XlsxPrinter implements Printer {
       } else {
         autoHeightRow(row);
       }
+    }
+
+    if (hasHeader) {
+      sheet.createFreezePane(0, 1);
     }
 
     workbook.write(outputStream);
