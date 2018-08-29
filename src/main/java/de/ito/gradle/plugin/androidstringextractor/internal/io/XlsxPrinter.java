@@ -133,6 +133,17 @@ public class XlsxPrinter implements Printer {
       sheet.createFreezePane(0, 1);
     }
 
+//    for (IndexedColors colors : IndexedColors.values()) {
+//      CellStyle style1 = workbook.createCellStyle();
+//      style1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//      style1.setFillForegroundColor(colors.getIndex());
+//
+//      Row row = sheet.createRow(rowNum++);
+//      Cell cell = row.createCell(0);
+//      cell.setCellStyle(style1);
+//      cell.setCellValue(colors.name());
+//    }
+
     workbook.write(outputStream);
   }
 

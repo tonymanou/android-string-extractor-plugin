@@ -6,10 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -144,18 +141,11 @@ class StringValuesReader {
       return null;
     }
 
-    NodeList nodes = node.getChildNodes();
     try (StringBuilderWriter writer = new StringBuilderWriter()) {
       Transformer t = TransformerFactory.newInstance().newTransformer();
       t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-      for (int i = 0, max = nodes.getLength(); i < max; i++) {
-        Node child = nodes.item(i);
-        if (child.getNodeType() == Node.COMMENT_NODE) {
-          continue;
-        }
-        t.transform(new DOMSource(child), new StreamResult(writer));
-      }
+      transformNodeContentToText(node, t, new StreamResult(writer));
 
       String str = writer.toString();
 
@@ -165,6 +155,36 @@ class StringValuesReader {
         .collect(Collectors.joining(" "));
     } catch (TransformerException e) {
       throw new IllegalStateException("Failed to convert node to text", e);
+    }
+  }
+
+  private void transformNodeContentToText(Node node, Transformer t, Result result) throws TransformerException {
+    if (node == null) {
+      return;
+    }
+
+    NodeList nodes = node.getChildNodes();
+    for (int i = 0, max = nodes.getLength(); i < max; i++) {
+      Node child = nodes.item(i);
+      switch (child.getNodeType()) {
+        case Node.COMMENT_NODE:
+          break;
+//        case Node.ELEMENT_NODE:
+//          if ("xliff:g".equals(child.getNodeName())) {
+//            NamedNodeMap attributes = child.getAttributes();
+//            if (attributes != null) {
+//              Node translatableAttribute = attributes.getNamedItem("translatable");
+//              if (translatableAttribute == null || !"false".equalsIgnoreCase(translatableAttribute.getNodeValue())) {
+//                values.put(new StringRes(key, convertNodeContentToText(node)));
+//                break;
+//              }
+//            }
+//            break;
+//          }
+//          // Fall-through
+        default:
+          t.transform(new DOMSource(child), result);
+      }
     }
   }
 }
