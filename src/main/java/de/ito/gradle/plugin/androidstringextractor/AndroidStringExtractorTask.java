@@ -30,17 +30,49 @@ public class AndroidStringExtractorTask extends DefaultTask {
   public void extractStringsFromLayouts() throws Exception {
     String projectPath = getProject().getProjectDir().getPath();
     Map<String, Map<String, StringValues>> d = stringExtractor.extract(projectPath);
+
+    Map<String, StringValues> mainData = d.get("main");
+    String defaultLocale = "en";
+    List<String> mainQualifiers = mainData.keySet().stream()
+            .filter(lang -> lang != null && !defaultLocale.equals(lang))
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+
+    d.forEach((flavor, data) -> {
+      if (!"main".equals(flavor)) {
+        mainData.forEach((qualifier, mainValues) -> {
+          StringValues values = data.get(qualifier);
+          if (values == null) {
+            data.put(qualifier, mainValues);
+          } else {
+            List<Res> resources = new ArrayList<>(values.getValues());
+            Set<Res> target = values.getValues();
+            target.clear();
+
+            mainValues.getValues().forEach(res -> {
+              Res overrideRes = resources.stream()
+                      .filter(r -> r.getClass().isInstance(res) && r.getKey().equals(res.getKey()))
+                      .findFirst().orElse(res);
+              target.add(overrideRes);
+            });
+          }
+        });
+      }
+    });
+
     d.forEach((flavor, data) -> {
       if (data.isEmpty()) {
         return;
       }
 
-      String defaultLocale = "en";
-
-      List<String> qualifiers = data.keySet().stream()
+      Set<String> unionQualifiers = new HashSet<>(mainQualifiers);
+      unionQualifiers.addAll(data.keySet());
+      List<String> qualifiers = unionQualifiers.stream()
               .filter(lang -> lang != null && !defaultLocale.equals(lang))
               .sorted()
               .collect(Collectors.toList());
+
       List<String> headers = new ArrayList<>();
       headers.add("name");
       headers.add(defaultLocale + " (default)");
