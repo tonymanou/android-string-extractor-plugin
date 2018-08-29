@@ -22,6 +22,7 @@ public class XlsxPrinter implements Printer {
   private final OutputStream outputStream;
   private final Workbook workbook;
   private final CellStyle baseStyle;
+  private final CellStyle baseMissingStyle;
   private final Sheet sheet;
 
   private boolean hasHeader = false;
@@ -42,6 +43,13 @@ public class XlsxPrinter implements Printer {
     style.setFont(font);
     style.setWrapText(true);
     baseStyle = style;
+
+    CellStyle styleMissing = workbook.createCellStyle();
+    styleMissing.setFont(font);
+    styleMissing.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    styleMissing.setFillForegroundColor(IndexedColors.LEMON_CHIFFON.getIndex());
+    styleMissing.setWrapText(true);
+    baseMissingStyle = styleMissing;
 
     outputStream = out;
   }
@@ -76,11 +84,17 @@ public class XlsxPrinter implements Printer {
 
     Row row = sheet.createRow(rowNum++);
     for (int i = 0; i < columns.length; i++) {
+      String content = columns[i];
+
       Cell cell = row.createCell(i);
       if (i != 0) {
-        cell.setCellStyle(baseStyle);
+        if (content == null || content.isEmpty()) {
+          cell.setCellStyle(baseMissingStyle);
+        } else {
+          cell.setCellStyle(baseStyle);
+        }
       }
-      cell.setCellValue(prepareString(columns[i]));
+      cell.setCellValue(prepareString(content));
     }
   }
 
